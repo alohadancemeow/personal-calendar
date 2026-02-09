@@ -41,10 +41,10 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def decode_access_token(token: str) -> Optional[TokenData]:
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
+        user_id: str = payload.get("sub")
+        if user_id is None:
             return None
-        token_data = TokenData(username=username)
+        token_data = TokenData(id=int(user_id))
     except JWTError:
         return None
     return token_data

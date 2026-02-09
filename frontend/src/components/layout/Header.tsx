@@ -1,8 +1,11 @@
 import { Link } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { useAuthStore } from "@/store/auth";
 
 export default function Header() {
+    const user = useAuthStore(state => state.user);
+
     const toggleDarkMode = () => {
         document.documentElement.classList.toggle('dark');
         if (document.documentElement.classList.contains('dark')) {
@@ -36,18 +39,26 @@ export default function Header() {
                             <span className="material-symbols-outlined text-slate-500 dark:text-slate-400 text-xl">notifications</span>
                         </Button>
                     </div>
-                    <div className="flex items-center gap-3">
-                        <div className="text-right hidden sm:block">
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Good morning,</p>
-                            <p className="text-sm font-bold">Stephen</p>
+                    {user ? (
+                        <div className="flex items-center gap-3">
+                            <div className="text-right hidden sm:block">
+                                <p className="text-xs text-slate-500 dark:text-slate-400">Good morning,</p>
+                                <p className="text-sm font-bold">{user?.username}</p>
+                            </div>
+                            <Link to="/settings">
+                                <Avatar className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+                                    <AvatarImage src={`${user?.image}`} />
+                                    <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
+                                </Avatar>
+                            </Link>
                         </div>
-                        <Link to="/settings">
-                            <Avatar className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
-                                <AvatarImage src="https://lh3.googleusercontent.com/aida-public/AB6AXuBnURP69L005m2JYroHFR-UP6VoUNvekwFex04dqUisQP7XDllDc1ODYV8J5_k9zEts6N2p0fQZC_ujVaOJ4BuUoveawirgTrWjUb2vz2btJCRFPAdWtvddbyEXvVlKOMKydKmF0X3Tv7rEjXeKKr_gsm6s6uPXz2HfwVJnaQvOdv21Q2d_n9fW-lxgAM3D80ksnJbBSuLEPDzjuWz-mRG8z0J7FnZCtEkautPdl6W7zlCP0jrlLHBKRe-WmKoD1NUs1dX9za_YSO0" />
-                                <AvatarFallback>SO</AvatarFallback>
-                            </Avatar>
-                        </Link>
-                    </div>
+                    ) : (
+                        <div className="flex items-center gap-3">
+                            <Link to="/login">
+                                <Button variant="default" size="sm" className="h-8 cursor-pointer rounded-lg text-sm font-medium">Login</Button>
+                            </Link>
+                        </div>
+                    )}
                 </div>
             </div>
         </header>

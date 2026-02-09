@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils"
@@ -9,6 +11,9 @@ import {
     FieldLabel,
     FieldSeparator,
 } from "@/components/ui/field"
+import { useAuthStore } from '@/store/auth';
+import { jwtDecode } from 'jwt-decode';
+import type { DecodedToken } from '@/types';
 
 export default function Signup() {
     return (
@@ -20,15 +25,80 @@ export default function Signup() {
     );
 }
 
+
 export function SignupForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        if (password !== confirmPassword) {
+            setError('Passwords do not match');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:8000/register', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username: name, email, password }),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Registration failed');
+            }
+
+            // Automatic login after successful registration
+            const formData = new URLSearchParams();
+            formData.append('username', email);
+            formData.append('password', password);
+
+            const loginResponse = await fetch('http://localhost:8000/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString(),
+            });
+
+            if (!loginResponse.ok) {
+                // Fallback to login page if auto-login fails
+                navigate('/login');
+                return;
+            }
+
+            const loginData = await loginResponse.json();
+            const token = loginData.access_token;
+            const decodedToken = jwtDecode<DecodedToken>(token);
+
+            const user = { username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
+
+            login(user, token);
+            navigate('/');
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card className="overflow-hidden p-0">
                 <CardContent className="grid p-0 md:grid-cols-2">
-                    <form className="p-6 md:p-8">
+                    <form className="p-6 md:p-8" onSubmit={handleSubmit}>
                         <FieldGroup>
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <h1 className="text-2xl font-bold">Create your account</h1>
@@ -36,6 +106,7 @@ export function SignupForm({
                                     Enter your email below to create your account
                                 </p>
                             </div>
+                            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                             <Field>
                                 <FieldLabel htmlFor="name">Name</FieldLabel>
                                 <Input
@@ -43,6 +114,8 @@ export function SignupForm({
                                     type="text"
                                     placeholder="John Doe"
                                     required
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
                                 />
                             </Field>
                             <Field>
@@ -52,6 +125,8 @@ export function SignupForm({
                                     type="email"
                                     placeholder="m@example.com"
                                     required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                                 <FieldDescription>
                                     We&apos;ll use this to contact you. We will not share your
@@ -62,13 +137,25 @@ export function SignupForm({
                                 <Field className="grid grid-cols-2 gap-4">
                                     <Field>
                                         <FieldLabel htmlFor="password">Password</FieldLabel>
-                                        <Input id="password" type="password" required />
+                                        <Input
+                                            id="password"
+                                            type="password"
+                                            required
+                                            value={password}
+                                            onChange={(e) => setPassword(e.target.value)}
+                                        />
                                     </Field>
                                     <Field>
                                         <FieldLabel htmlFor="confirm-password">
                                             Confirm Password
                                         </FieldLabel>
-                                        <Input id="confirm-password" type="password" required />
+                                        <Input
+                                            id="confirm-password"
+                                            type="password"
+                                            required
+                                            value={confirmPassword}
+                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                        />
                                     </Field>
                                 </Field>
                                 <FieldDescription>
@@ -107,7 +194,7 @@ export function SignupForm({
                                             fill="currentColor"
                                         />
                                     </svg>
-                                    <span className="sr-only">Sign up with Meta</span>
+                                    <span className="sr-only">Login with Meta</span>
                                 </Button>
                             </Field>
                             <FieldDescription className="text-center">

@@ -7,9 +7,17 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuthStore } from "@/store/auth";
+import { useNavigate } from 'react-router-dom';
 
 export default function Settings() {
     const [activeTab, setActiveTab] = useState('profile');
+
+    const logout = useAuthStore(state => state.logout);
+    const user = useAuthStore(state => state.user);
+    const navigate = useNavigate();
+
+    console.log(user);
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-10 w-full overflow-y-auto">
@@ -53,7 +61,13 @@ export default function Settings() {
                     </Button>
 
                     <div className="pt-4 mt-4 border-t border-slate-200 dark:border-slate-800">
-                        <Button variant="ghost" className="w-full justify-start gap-3 h-12 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20">
+                        <Button onClick={() => {
+                            logout();
+                            navigate("/login");
+                        }}
+                            variant="ghost"
+                            className="w-full cursor-pointer justify-start gap-3 h-12 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        >
                             <span className="material-symbols-outlined">logout</span>
                             Sign Out
                         </Button>
@@ -72,7 +86,10 @@ export default function Settings() {
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 <div className="relative">
                                     <Avatar className="w-24 h-24 rounded-2xl ring-4 ring-slate-50 dark:ring-slate-800">
-                                        <AvatarImage src="https://lh3.googleusercontent.com/aida-public/AB6AXuB4tiRKuSLvEdDsAQlk5Cre0tNZEZ6lVP5qHNOr2HnqpeQqO_lLCmBLeEG61w1LoI2utdaXwnx9RrHnkl9fc5ZI9jWqapawGsrscrF2pfRbWnAOZkpXauDCb38Y6LhfQeWa3iNyDryVUX5W1z7awikbI4Dw1z8ZZ0kB1nDQZD-IUpethnw42WceSAuKcF-mBxVA342_0sHgma9ixtv6ezvkM8hTwp8M0bVYOq7q3RTxB2HsK89uqDCN9Ka0QQzcqHJI7Ae8niVWi6g" className="object-cover" />
+                                        <AvatarImage
+                                            src={`${user?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuB4tiRKuSLvEdDsAQlk5Cre0tNZEZ6lVP5qHNOr2HnqpeQqO_lLCmBLeEG61w1LoI2utdaXwnx9RrHnkl9fc5ZI9jWqapawGsrscrF2pfRbWnAOZkpXauDCb38Y6LhfQeWa3iNyDryVUX5W1z7awikbI4Dw1z8ZZ0kB1nDQZD-IUpethnw42WceSAuKcF-mBxVA342_0sHgma9ixtv6ezvkM8hTwp8M0bVYOq7q3RTxB2HsK89uqDCN9Ka0QQzcqHJI7Ae8niVWi6g"}`}
+                                            className="object-cover"
+                                        />
                                         <AvatarFallback>SO</AvatarFallback>
                                     </Avatar>
                                     <Button size="icon" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full shadow-lg hover:scale-110 transition-transform">
@@ -91,11 +108,11 @@ export default function Settings() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Full Name</Label>
-                                    <Input defaultValue="Stephen Oladipo" />
+                                    <Input defaultValue={`${user?.username || "Stephen Oladipo"}`} />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Email Address</Label>
-                                    <Input type="email" defaultValue="stephen.o@example.com" />
+                                    <Input type="email" defaultValue={`${user?.email}`} value={user?.email} />
                                 </div>
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Bio</Label>

@@ -41,3 +41,10 @@ export type Event = {
     location?: LocationType;
     // attachments?: { name: string; size: string; type: 'pdf' | 'image' | 'zip' }[];
 }
+
+export type DecodedToken = {
+    sub: string; // User ID
+    username: string;
+    email: string;
+    image?: string;
+}

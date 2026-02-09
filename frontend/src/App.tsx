@@ -6,15 +6,20 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import './index.css';
 
+import ProtectedRoute from '@/components/ProtectedRoute';
+
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<DashboardLayout />}>
-          <Route index element={<DayView />} />
-          <Route path="settings" element={<Settings />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<DashboardLayout />}>
+            <Route index element={<DayView />} />
+            <Route path="settings" element={<Settings />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

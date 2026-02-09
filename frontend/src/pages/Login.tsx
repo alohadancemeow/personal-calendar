@@ -1,3 +1,6 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthStore } from '@/store/auth';
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -9,6 +12,8 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
+import { jwtDecode } from 'jwt-decode';
+import type { DecodedToken } from '@/types';
 
 export default function Login() {
     return (
@@ -24,11 +29,56 @@ export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState<string | null>(null);
+
+    const navigate = useNavigate();
+    const login = useAuthStore((state) => state.login);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+
+        try {
+            const formData = new URLSearchParams();
+            formData.append('username', email); // FastAPI expects 'username' for the email field in /token
+            formData.append('password', password);
+
+            const response = await fetch('http://localhost:8000/token', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString(),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || 'Login failed');
+            }
+
+            const data = await response.json();
+            const token = data.access_token;
+
+            const decodedToken = jwtDecode<DecodedToken>(token);
+
+            console.log(decodedToken, 'decodedToken');
+
+            const user = { username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
+
+            login(user, token);
+            navigate('/'); // Redirect to home page on successful login
+        } catch (err: any) {
+            setError(err.message);
+        }
+    };
+
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
             <Card className="overflow-hidden p-0">
                 <CardContent className="grid p-0 md:grid-cols-2">
-                    <form className="p-6 md:p-8">
+                    <form className="p-6 md:p-8" onSubmit={handleSubmit}>
                         <FieldGroup>
                             <div className="flex flex-col items-center gap-2 text-center">
                                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -36,6 +86,7 @@ export function LoginForm({
                                     Login to your calendar account
                                 </p>
                             </div>
+                            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                             <Field>
                                 <FieldLabel htmlFor="email">Email</FieldLabel>
                                 <Input
@@ -43,13 +94,21 @@ export function LoginForm({
                                     type="email"
                                     placeholder="m@example.com"
                                     required
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </Field>
                             <Field>
                                 <div className="flex items-center">
                                     <FieldLabel htmlFor="password">Password</FieldLabel>
                                 </div>
-                                <Input id="password" type="password" required />
+                                <Input
+                                    id="password"
+                                    type="password"
+                                    required
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                />
                             </Field>
                             <Field>
                                 <Button type="submit">Login</Button>
@@ -102,4 +161,5 @@ export function LoginForm({
             </Card>
         </div>
     )
+
 }

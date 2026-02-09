@@ -34,7 +34,7 @@ class DBUser(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
+    username = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     image = Column(String, nullable=True)
@@ -105,3 +105,7 @@ def create_user(db: Session, user: UserInDB):
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_user_by_id(db: Session, user_id: int) -> Optional[DBUser]:
+    return db.query(DBUser).filter(DBUser.id == user_id).first()
