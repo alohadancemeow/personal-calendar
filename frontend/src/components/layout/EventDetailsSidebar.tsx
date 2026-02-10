@@ -48,9 +48,9 @@ export default function EventDetailsSidebar() {
                     {selectedEvent.description && (
                         <div>
                             <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Description</h4>
-                            <p className="text-sm leading-relaxed text-slate-600 dark:text-slate-400">
+                            <div className="text-sm leading-relaxed text-slate-600 dark:text-slate-400 break-all whitespace-pre-wrap">
                                 {selectedEvent.description}
-                            </p>
+                            </div>
                         </div>
                     )}
                     {selectedEvent.location && (
@@ -68,7 +68,7 @@ export default function EventDetailsSidebar() {
                                     </p>
                                     {selectedEvent.location.type === 'online' && selectedEvent.location.link && (
                                         <a
-                                            className="text-xs text-primary hover:underline block truncate"
+                                            className="text-xs text-primary hover:underline block break-all whitespace-pre-wrap"
                                             href={selectedEvent.location.link}
                                             target="_blank"
                                             rel="noopener noreferrer"

@@ -130,6 +130,16 @@ export default function CreateEventModal() {
         };
 
         try {
+            if (startHour < 8 || startHour > 18 || (startHour === 18 && startMinute > 0)) {
+                alert("Start time must be between 08:00 and 18:00");
+                return;
+            }
+
+            if (endHour < 8 || endHour > 18 || (endHour === 18 && endMinute > 0)) {
+                alert("End time must be between 08:00 and 18:00");
+                return;
+            }
+
             const response = await fetch("http://localhost:8000/events/", {
                 method: "POST",
                 headers: {
@@ -203,7 +213,7 @@ export default function CreateEventModal() {
                         </div>
                         <div className="space-y-1.5">
                             <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">
-                                Category Color
+                                Event Type
                             </Label>
                             <div className="flex items-center h-[56px] sm:h-[52px] gap-3 px-4 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700">
                                 <RadioGroup
@@ -275,6 +285,8 @@ export default function CreateEventModal() {
                                 <Input
                                     id="start"
                                     type="time"
+                                    min="08:00"
+                                    max="18:00"
                                     value={startTime}
                                     onChange={(e) => setStartTime(e.target.value)}
                                     className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
@@ -295,11 +307,21 @@ export default function CreateEventModal() {
                                 <Input
                                     id="end"
                                     type="time"
+                                    min="08:00"
+                                    max="18:00"
                                     value={endTime}
                                     onChange={(e) => setEndTime(e.target.value)}
                                     className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
                                 />
                             </div>
+                        </div>
+                        <div className="col-span-2 flex items-center gap-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-2xl">
+                            <span className="material-symbols-outlined text-amber-600 dark:text-amber-500">
+                                info
+                            </span>
+                            <p className="text-sm font-medium text-amber-800 dark:text-amber-300">
+                                Time must be between 08:00 and 18:00
+                            </p>
                         </div>
                     </div>
 

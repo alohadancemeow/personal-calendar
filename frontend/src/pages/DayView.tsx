@@ -49,7 +49,7 @@ export default function DayView() {
     }, [token, selectedDate]);
 
     const handleEventClick = (id: string) => {
-        if (selectedEvent?.id === id) {
+        if (selectedEvent?.id?.toString() === id) {
             setSelectedEvent(null);
             return;
         }
@@ -61,6 +61,7 @@ export default function DayView() {
     const HOUR_HEIGHT_PX = 96; // py-12 * 2 = 6rem = 96px
     const MINUTE_HEIGHT_PX = HOUR_HEIGHT_PX / 60;
     const START_HOUR = 8; // The view starts at 8 AM
+    const END_HOUR = 18; // 6 PM
 
     const [currentTime, setCurrentTime] = useState(new Date());
 
@@ -80,7 +81,7 @@ export default function DayView() {
     // Only show if time is within the view range (optional, but good practice)
     // Actually, allowing it to render even if off-screen (due to overflow-hidden) is often simpler.
     // Given the fixed height of the scroll container, it will just not be visible.
-    const isVisible = timeInMinutes >= (START_HOUR * 60) && indicatorTop >= 0;
+    const isVisible = timeInMinutes >= (START_HOUR * 60) && timeInMinutes <= (END_HOUR * 60);
 
     // Calculate top and height for events
     const positionedEvents = events.map(event => {
@@ -138,12 +139,12 @@ export default function DayView() {
                                 <div
                                     key={event.id}
                                     onClick={() => handleEventClick(event.id.toString())}
-                                    className={`absolute inset-x-4 rounded-r-xl p-4 transition-all cursor-pointer z-20
+                                    className={`absolute inset-x-4 rounded-r-xl p-4 transition-all cursor-pointer
                                         ${event.type === 'work' ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''}
                                         ${event.type === 'personal' ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''}
                                         ${event.type === 'social' ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500' : ''}
                                         ${event.type === 'project' ? 'bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500' : ''}
-                                        ${selectedEvent?.id === event.id ? '' : 'hover:shadow-md'}
+                                        ${selectedEvent?.id === event.id ? 'z-50 shadow-xl' : 'z-20 hover:shadow-md'}
                                     `}
                                     style={{
                                         top: `${event.top}px`,

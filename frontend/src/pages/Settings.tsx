@@ -191,9 +191,6 @@ export default function Settings() {
                     </div>
                 </div>
             </div>
-            <footer className="max-w-6xl mx-auto px-6 py-10 mt-12 border-t border-slate-200 dark:border-slate-800 text-center">
-                <p className="text-slate-500 text-sm">© 2025 Modern Calendar Inc. All rights reserved.</p>
-            </footer>
         </div>
     );
 }
