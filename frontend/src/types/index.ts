@@ -16,8 +16,9 @@ export type EventType = 'work' | 'personal' | 'social' | 'project';
 
 export type User = {
     id: string;
-    name: string;
-    avatar: string;
+    username: string;
+    email: string;
+    image: string;
 }
 
 type LocationType = {

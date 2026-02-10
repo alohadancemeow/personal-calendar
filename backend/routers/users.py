@@ -14,7 +14,10 @@ from database import (
     get_user_by_id,
 )
 
+import crud
+
 router = APIRouter()
+
 
 oauth2_scheme = auth.oauth2_scheme
 
@@ -76,3 +79,9 @@ def login_for_access_token(
 @router.get("/users/me/", response_model=schemas.UserResponse)
 def read_users_me(current_user: DBUser = Depends(get_current_user)):
     return current_user
+
+
+@router.get("/users/", response_model=list[schemas.UserResponse])
+def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_users(db, skip=skip, limit=limit)
+    return users

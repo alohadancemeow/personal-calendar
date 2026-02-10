@@ -1,5 +1,5 @@
 from typing import Optional
-from sqlalchemy import create_engine, Column, Integer, String, Table, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Table, ForeignKey, Date
 from sqlalchemy.orm import relationship, sessionmaker, Session
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.declarative import declarative_base
@@ -54,6 +54,7 @@ class DBEvent(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, index=True)
+    start_date = Column(Date, nullable=False)
     time = Column(String)
     duration = Column(String)
     type = Column(String)

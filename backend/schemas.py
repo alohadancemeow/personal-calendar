@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Optional, List
 from pydantic import BaseModel, EmailStr, Field
 from enum import Enum
@@ -56,6 +57,7 @@ class LocationType(BaseModel):
 
 class EventBase(BaseModel):
     title: str
+    start_date: date
     time: str
     duration: str
     type: EventType

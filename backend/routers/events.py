@@ -1,3 +1,5 @@
+from typing import Optional
+from datetime import date
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -21,8 +23,16 @@ def create_event(
 
 
 @router.get("/events/", response_model=List[schemas.EventResponse])
-def read_events(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    events = crud.get_events(db, skip=skip, limit=limit)
+def read_events(
+    skip: int = 0,
+    limit: int = 100,
+    date: Optional[date] = None,
+    db: Session = Depends(get_db),
+    current_user: DBUser = Depends(get_current_user),
+):
+    events = crud.get_events(
+        db, creator_id=current_user.id, skip=skip, limit=limit, event_date=date
+    )
     return events
 
 

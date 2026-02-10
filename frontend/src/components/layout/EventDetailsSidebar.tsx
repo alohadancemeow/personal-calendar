@@ -16,8 +16,8 @@ export default function EventDetailsSidebar() {
     }
 
     return (
-        <aside className="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex flex-col hidden xl:flex">
-            <div className={`h-48 bg-gradient-to-br p-8 relative flex flex-col justify-end overflow-hidden shrink-0
+        <aside className="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex-col hidden xl:flex">
+            <div className={`h-48 bg-linear-to-br p-8 relative flex flex-col justify-end overflow-hidden shrink-0
                          ${selectedEvent.type === 'work' ? 'from-blue-400 to-blue-600' : ''}
                          ${selectedEvent.type === 'personal' ? 'from-orange-400 to-orange-600' : ''}
                          ${selectedEvent.type === 'social' ? 'from-green-400 to-green-600' : ''}
@@ -91,11 +91,11 @@ export default function EventDetailsSidebar() {
                                     <div key={index} className="flex items-center justify-between">
                                         <div className="flex items-center gap-3">
                                             <Avatar className="w-9 h-9 rounded-xl">
-                                                <AvatarImage src={participant.avatar} />
-                                                <AvatarFallback>{participant.name}</AvatarFallback>
+                                                <AvatarImage src={participant.image} />
+                                                <AvatarFallback>{participant.username[0]}</AvatarFallback>
                                             </Avatar>
                                             <div>
-                                                <p className="text-sm font-bold">{participant.name}</p>
+                                                <p className="text-sm font-bold">{participant.username}</p>
                                                 <p className="text-[10px] text-slate-500">Participant</p>
                                             </div>
                                         </div>

@@ -8,167 +8,52 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { type Event } from '@/types';
 import { useSelectDateStore } from '@/store/selectDate';
 import { useSelectedEventStore } from '@/store/selectedEvent';
-
-
-const mockEvents: Event[] = [
-    {
-        id: 'product_sync',
-        title: 'Product Sync Meeting',
-        time: '9:15 AM - 9:45 AM',
-        creator: {
-            id: "a",
-            name: "A",
-            avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-        },
-        duration: '30min',
-        participants: [
-            {
-                id: "a",
-                name: "A",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-            },
-            {
-                id: "b",
-                name: "B",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-            },
-        ],
-        type: 'work',
-        startMinute: (9 * 60) + 15, // 9:15 AM
-        endMinute: (9 * 60) + 45, // 9:45 AM
-        description: 'Discuss Q3 product roadmap and sprint goals.',
-        location: {
-            type: 'onsite',
-            address: '123 Main St, San Francisco, CA',
-        },
-    },
-    {
-        id: 'landing_page_review',
-        title: 'Landing page review',
-        time: '11:30 AM - 1:00 PM',
-        creator: {
-            id: "a",
-            name: "A",
-            avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-        },
-        duration: '1h 30min',
-        type: 'personal',
-        participants: [
-            {
-                id: "a",
-                name: "A",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-            },
-            {
-                id: "b",
-                name: "B",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-            },
-        ],
-        startMinute: (13 * 60), // 1:00 PM - changed for visibility in mockup
-        endMinute: (14 * 60) + 30, // 2:30 PM - changed for visibility in mockup
-        description: 'Review the new landing page design and content with marketing team.',
-        location: {
-            type: 'online',
-            platform: 'Zoom',
-            link: 'https://zoom.us/j/1234567890',
-        },
-        // attachments: [
-        //     { name: 'Draft_V2.pdf', size: '1.2 MB', type: 'pdf' },
-        //     { name: 'Screenshots.zip', size: '4.5 MB', type: 'zip' },
-        // ],
-    },
-    {
-        id: 'team_standup',
-        title: 'Team Standup',
-        time: '8:00 AM - 8:15 AM',
-        creator: {
-            id: "a",
-            name: "A",
-            avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-        },
-        duration: '15min',
-        type: 'social',
-        startMinute: (8 * 60), // 8:00 AM
-        endMinute: (8 * 60) + 15, // 8:15 AM
-        description: 'Daily sync with the development team to discuss progress and blockers.',
-        location: {
-            type: 'onsite',
-            address: '123 Main St, San Francisco, CA',
-        },
-    },
-    {
-        id: 'client_call',
-        title: 'Client Call - Project X',
-        time: '2:00 PM - 3:00 PM',
-        creator: {
-            id: "a",
-            name: "A",
-            avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-        },
-        duration: '1hr',
-        type: 'project',
-        startMinute: (14 * 60), // 2:00 PM
-        endMinute: (15 * 60), // 3:00 PM
-        description: 'Quarterly review with key client stakeholders for Project X.',
-        location: {
-            type: 'online',
-            platform: 'Microsoft Teams',
-            link: 'https://zoom.us/j/1234567890',
-        },
-    },
-    {
-        id: 'design_review',
-        title: 'Design System Review',
-        time: '4:00 PM - 5:00 PM',
-        duration: '1hr',
-        creator: {
-            id: "a",
-            name: "A",
-            avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo",
-        },
-        type: 'social',
-        participants: [
-            {
-                id: "d",
-                name: "D",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo"
-            },
-            {
-                id: "a",
-                name: "D",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo"
-            },
-            {
-                id: "c",
-                name: "D",
-                avatar: "https://lh3.googleusercontent.com/aida-public/AB6AXuBC9nZPRC1Wc9dzD4ozud41LPfOq6rmkRTCRJh-RxDAjkFJ7WtYIzSePQtdyst4wnW9GUT0gBTZE35U_c5yxT3aVSYmMN5tvNKwkhrcfFX2CMhGONViqw87hAN5f2A9HTT3PhAslpxcWHHXBfcqe8S-pcVVgQUjWZxoTTPgB-Wxpm462J5bVy7cR1O17ccMEiXmb2_LULWMLPfTS4SLNMgnZpZxyLHPOzqovn__LS-e0F2onLPMtx7XXLQhbb7uWdvW_MZvbblv7Fo"
-            }
-        ],
-        startMinute: (16 * 60), // 4:00 PM
-        endMinute: (17 * 60), // 5:00 PM
-        description: 'Review updates and new components for the company design system.',
-        location: {
-            type: 'online',
-            platform: 'Google Meet',
-            link: 'https://zoom.us/j/1234567890',
-        },
-    },
-];
+import { useAuthStore } from '@/store/auth';
 
 export default function DayView() {
+    const [events, setEvents] = useState<Event[]>([]);
+
     const { setIsModalOpen } = useOutletContext<{ setIsModalOpen: (open: boolean) => void }>();
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
-
     const selectedEvent = useSelectedEventStore((state) => state.selectedEvent);
     const setSelectedEvent = useSelectedEventStore((state) => state.setSelectedEvent);
+
+    const token = useAuthStore((state) => state.token);
+
+    console.log(events, 'events');
+
+    useEffect(() => {
+        const fetchEvents = async () => {
+            try {
+                const formattedDate = format(selectedDate, "yyyy-MM-dd");
+                const response = await fetch(`http://localhost:8000/events/?date=${formattedDate}`, {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch events");
+                }
+
+                const data = await response.json();
+                setEvents(data);
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        if (token) {
+            fetchEvents();
+        }
+    }, [token, selectedDate]);
 
     const handleEventClick = (id: string) => {
         if (selectedEvent?.id === id) {
             setSelectedEvent(null);
             return;
         }
-        const event = mockEvents.find(e => e.id === id);
+        const event = events.find(e => e.id.toString() === id);
         setSelectedEvent(event || null);
     };
 
@@ -198,13 +83,11 @@ export default function DayView() {
     const isVisible = timeInMinutes >= (START_HOUR * 60) && indicatorTop >= 0;
 
     // Calculate top and height for events
-    const positionedEvents = mockEvents.map(event => {
+    const positionedEvents = events.map(event => {
         const top = (event.startMinute - (START_HOUR * 60)) * MINUTE_HEIGHT_PX;
         const height = (event.endMinute - event.startMinute) * MINUTE_HEIGHT_PX;
         return { ...event, top, height };
     });
-
-    // todo: fetch events on that day
 
     return (
         <div className="flex flex-1 overflow-hidden h-full">
@@ -254,7 +137,7 @@ export default function DayView() {
                             {positionedEvents.map(event => (
                                 <div
                                     key={event.id}
-                                    onClick={() => handleEventClick(event.id)}
+                                    onClick={() => handleEventClick(event.id.toString())}
                                     className={`absolute inset-x-4 rounded-r-xl p-4 transition-all cursor-pointer z-20
                                         ${event.type === 'work' ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''}
                                         ${event.type === 'personal' ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''}
@@ -291,8 +174,10 @@ export default function DayView() {
                                             <div className="flex -space-x-1.5">
                                                 {event.participants.map((participant, idx) => (
                                                     <Avatar key={idx} className="w-6 h-6 border-2 border-white dark:border-slate-900">
-                                                        <AvatarImage src={participant.avatar} />
-                                                        <AvatarFallback className="text-[8px]">{participant.name}</AvatarFallback>
+                                                        <AvatarImage src={participant.image} />
+                                                        <AvatarFallback className="text-[8px]">
+                                                            {participant.username[0]}
+                                                        </AvatarFallback>
                                                     </Avatar>
                                                 ))}
                                             </div>
