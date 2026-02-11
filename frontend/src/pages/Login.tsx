@@ -65,7 +65,7 @@ export function LoginForm({
 
             console.log(decodedToken, 'decodedToken');
 
-            const user = { username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
+            const user = { id: decodedToken.sub, username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
 
             login(user, token);
             navigate('/'); // Redirect to home page on successful login

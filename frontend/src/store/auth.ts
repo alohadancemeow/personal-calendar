@@ -3,9 +3,9 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 
 interface AuthState {
   isAuthenticated: boolean;
-  user: { username: string; email: string, image?: string } | null;
+  user: { id: string; username: string; email: string, image?: string } | null;
   token: string | null;
-  login: (user: { username: string; email: string, image?: string }, token: string) => void;
+  login: (user: { id: string; username: string; email: string, image?: string }, token: string) => void;
   logout: () => void;
 }
 

@@ -17,8 +17,6 @@ export default function Settings() {
     const user = useAuthStore(state => state.user);
     const navigate = useNavigate();
 
-    console.log(user);
-
     return (
         <div className="max-w-6xl mx-auto px-6 py-10 w-full overflow-y-auto">
             <div className="mb-8">

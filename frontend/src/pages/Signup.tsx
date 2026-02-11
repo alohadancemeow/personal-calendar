@@ -85,7 +85,7 @@ export function SignupForm({
             const token = loginData.access_token;
             const decodedToken = jwtDecode<DecodedToken>(token);
 
-            const user = { username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
+            const user = { id: decodedToken.sub, username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
 
             login(user, token);
             navigate('/');

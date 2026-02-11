@@ -42,7 +42,14 @@ export default function Header() {
                     {user ? (
                         <div className="flex items-center gap-3">
                             <div className="text-right hidden sm:block">
-                                <p className="text-xs text-slate-500 dark:text-slate-400">Good morning,</p>
+                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                    {new Date().getHours() < 12
+                                        ? 'Good morning'
+                                        : new Date().getHours() < 18
+                                            ? 'Good afternoon'
+                                            : 'Good evening'
+                                    }
+                                </p>
                                 <p className="text-sm font-bold">{user?.username}</p>
                             </div>
                             <Link to="/settings">

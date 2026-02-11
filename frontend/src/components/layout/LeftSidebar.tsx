@@ -61,7 +61,7 @@ export default function LeftSidebar() {
         <aside className="w-80 border-r border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark lg:flex hidden flex-col h-full">
             <div className="p-6">
                 <Button
-                    className="w-full cursor-pointer bg-primary hover:bg-orange-600 text-white font-semibold py-6 rounded-2xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 text-base"
+                    className="w-full cursor-pointer bg-primary hover:bg-orange-600 text-white font-semibold py-6 rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-primary/20 text-base"
                     onClick={() => openModal()}
                 >
                     <span className="material-symbols-outlined">add</span>

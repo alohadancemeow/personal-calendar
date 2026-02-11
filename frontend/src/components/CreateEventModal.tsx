@@ -219,7 +219,7 @@ export default function CreateEventModal() {
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && closeModal()}>
-            <DialogContent className="sm:max-w-lg bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 p-0 overflow-hidden gap-0 rounded-t-[2.5rem] sm:rounded-3xl">
+            <DialogContent className="sm:max-w-lg bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 p-0 overflow-hidden gap-0 rounded-xl">
                 <DialogHeader className="p-6 border-b border-gray-50 dark:border-slate-800">
                     <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span className="material-symbols-outlined text-primary">event</span>
@@ -242,7 +242,7 @@ export default function CreateEventModal() {
                             id="title"
                             placeholder="e.g., Landing page review"
                             required
-                            className="w-full px-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base"
+                            className="w-full px-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
@@ -265,7 +265,7 @@ export default function CreateEventModal() {
                                     type="date"
                                     value={date}
                                     onChange={(e) => setDate(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
+                                    className="w-full pl-12 pr-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
                                 />
                             </div>
                         </div>
@@ -273,7 +273,7 @@ export default function CreateEventModal() {
                             <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">
                                 Event Type
                             </Label>
-                            <div className="flex items-center h-[56px] sm:h-[52px] gap-3 px-4 bg-gray-50 dark:bg-slate-800 rounded-2xl border border-gray-200 dark:border-slate-700">
+                            <div className="flex items-center h-[56px] sm:h-[52px] gap-3 px-4 bg-gray-50 dark:bg-slate-800 rounded-xl border border-gray-200 dark:border-slate-700">
                                 <RadioGroup
                                     value={eventType}
                                     onValueChange={setEventType}
@@ -347,7 +347,7 @@ export default function CreateEventModal() {
                                     max="18:00"
                                     value={startTime}
                                     onChange={(e) => setStartTime(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
+                                    className="w-full pl-12 pr-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
                                 />
                             </div>
                         </div>
@@ -369,11 +369,11 @@ export default function CreateEventModal() {
                                     max="18:00"
                                     value={endTime}
                                     onChange={(e) => setEndTime(e.target.value)}
-                                    className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
+                                    className="w-full pl-12 pr-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary text-base appearance-none"
                                 />
                             </div>
                         </div>
-                        <div className="col-span-2 flex items-center gap-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-2xl">
+                        <div className="col-span-2 flex items-center gap-3 px-4 py-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-100 dark:border-amber-900/30 rounded-xl">
                             <span className="material-symbols-outlined text-amber-600 dark:text-amber-500">
                                 info
                             </span>
@@ -409,7 +409,7 @@ export default function CreateEventModal() {
                                         Platform
                                     </Label>
                                     <Select value={platform} onValueChange={setPlatform}>
-                                        <SelectTrigger className="w-full h-14 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus:ring-primary/20 focus:border-primary text-base">
+                                        <SelectTrigger className="w-full h-14 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus:ring-primary/20 focus:border-primary text-base">
                                             <SelectValue placeholder="Select platform" />
                                         </SelectTrigger>
                                         <SelectContent>
@@ -433,7 +433,7 @@ export default function CreateEventModal() {
                                         <Input
                                             id="url"
                                             placeholder="https://..."
-                                            className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-gray-400 text-base"
+                                            className="w-full pl-12 pr-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-gray-400 text-base"
                                             value={link}
                                             onChange={(e) => setLink(e.target.value)}
                                         />
@@ -455,7 +455,7 @@ export default function CreateEventModal() {
                                     <Input
                                         id="location"
                                         placeholder="Add location or room..."
-                                        className="w-full pl-12 pr-4 py-6 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-gray-400 text-base"
+                                        className="w-full pl-12 pr-4 py-6 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary placeholder:text-gray-400 text-base"
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
                                     />
@@ -474,7 +474,7 @@ export default function CreateEventModal() {
                         <Textarea
                             id="desc"
                             placeholder="Add details, links, or agenda..."
-                            className="w-full px-4 py-4 rounded-2xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary resize-none placeholder:text-gray-400 text-base"
+                            className="w-full px-4 py-4 rounded-xl border-gray-200 dark:border-slate-700 dark:bg-slate-800 dark:text-white focus-visible:ring-primary/20 focus-visible:border-primary resize-none placeholder:text-gray-400 text-base"
                             rows={3}
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
@@ -576,13 +576,13 @@ export default function CreateEventModal() {
                         <Button
                             variant="ghost"
                             onClick={closeModal}
-                            className="w-full cursor-pointer sm:flex-1 py-6 rounded-2xl font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all"
+                            className="w-full cursor-pointer sm:flex-1 py-6 rounded-xl font-semibold text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 transition-all"
                             type="button"
                         >
                             Cancel
                         </Button>
                         <Button
-                            className="w-full cursor-pointer sm:flex-1 py-6 rounded-2xl font-semibold text-white bg-primary hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
+                            className="w-full cursor-pointer sm:flex-1 py-6 rounded-xl font-semibold text-white bg-primary hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
                             type="submit"
                         >
                             <span>{eventToEdit ? "Update Event" : "Save Event"}</span>

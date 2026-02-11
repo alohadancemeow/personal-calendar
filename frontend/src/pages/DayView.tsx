@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { format } from "date-fns";
-import { useOutletContext } from 'react-router-dom';
 import UpcomingSidebar from '../components/layout/UpcomingSidebar';
 import EventDetailsSidebar from '../components/layout/EventDetailsSidebar';
 import { Button } from "@/components/ui/button";
@@ -9,18 +8,43 @@ import { useSelectDateStore } from '@/store/selectDate';
 import { useSelectedEventStore } from '@/store/selectedEvent';
 import { useAuthStore } from '@/store/auth';
 import { useEventsStore } from '@/store/events';
+import { useModalStore } from '@/store/modal';
 
 export default function DayView() {
     const { events, fetchEvents } = useEventsStore();
 
-    const { setIsModalOpen } = useOutletContext<{ setIsModalOpen: (open: boolean) => void }>();
+    const eventStyleConfig: Record<string, { container: string; title: string; time: string; ring: string }> = {
+        work: {
+            container: 'bg-blue-50/90 dark:bg-blue-900/40 border-blue-500 hover:bg-blue-100 dark:hover:bg-blue-900/60',
+            title: 'text-blue-800 dark:text-blue-200',
+            time: 'text-blue-600 dark:text-blue-400',
+            ring: 'ring-blue-500',
+        },
+        personal: {
+            container: 'bg-orange-50/90 dark:bg-orange-900/40 border-orange-500 hover:bg-orange-100 dark:hover:bg-orange-900/60',
+            title: 'text-orange-800 dark:text-orange-200',
+            time: 'text-orange-600 dark:text-orange-400',
+            ring: 'ring-orange-500',
+        },
+        social: {
+            container: 'bg-green-50/90 dark:bg-green-900/40 border-green-500 hover:bg-green-100 dark:hover:bg-green-900/60',
+            title: 'text-green-800 dark:text-green-200',
+            time: 'text-green-600 dark:text-green-400',
+            ring: 'ring-green-500',
+        },
+        project: {
+            container: 'bg-purple-50/90 dark:bg-purple-900/40 border-purple-500 hover:bg-purple-100 dark:hover:bg-purple-900/60',
+            title: 'text-purple-800 dark:text-purple-200',
+            time: 'text-purple-600 dark:text-purple-400',
+            ring: 'ring-purple-500',
+        }
+    };
+
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
     const selectedEvent = useSelectedEventStore((state) => state.selectedEvent);
     const setSelectedEvent = useSelectedEventStore((state) => state.setSelectedEvent);
-
+    const openModal = useModalStore((state) => state.openModal);
     const token = useAuthStore((state) => state.token);
-
-    // console.log(events, 'events');
 
     useEffect(() => {
         if (token) {
@@ -63,16 +87,39 @@ export default function DayView() {
     // Given the fixed height of the scroll container, it will just not be visible.
     const isVisible = timeInMinutes >= (START_HOUR * 60) && timeInMinutes <= (END_HOUR * 60);
 
-    // Calculate top and height for events
-    const positionedEvents = events.map(event => {
-        const top = (event.startMinute - (START_HOUR * 60)) * MINUTE_HEIGHT_PX;
-        const height = (event.endMinute - event.startMinute) * MINUTE_HEIGHT_PX;
-        return { ...event, top, height };
+    // Calculate top, height, and horizontal position for events
+    const processedEvents = events
+        .map(event => {
+            const top = (event.startMinute - (START_HOUR * 60)) * MINUTE_HEIGHT_PX;
+            const height = (event.endMinute - event.startMinute) * MINUTE_HEIGHT_PX;
+            return { ...event, top, height };
+        })
+        .sort((a, b) => a.startMinute - b.startMinute);
+
+    // Calculate overlaps
+    const eventsWithLayout = processedEvents.map((event, _index, array) => {
+        // Find overlapping events
+        const overlappingEvents = array.filter(e =>
+            (e.startMinute < event.endMinute && e.endMinute > event.startMinute)
+        );
+
+        const totalOverlaps = overlappingEvents.length;
+
+        // Find index of current event within the overlapping group (sorted by start time)
+        const indexInGroup = overlappingEvents.indexOf(event);
+
+        // Simple width calculation: 100% / number of overlapping events
+        // Use a slightly smaller width (e.g., 95%) to leave a gap
+        const widthPercent = 95 / totalOverlaps;
+        // Left position is simply index * width
+        const leftPercent = indexInGroup * (100 / totalOverlaps);
+
+        return { ...event, widthPercent, leftPercent, zIndex: 10 + indexInGroup };
     });
 
     return (
         <div className="flex flex-1 overflow-hidden h-full">
-            <section className="flex-1 bg-white dark:bg-slate-900 overflow-y-auto scrollbar-hide relative h-full pb-15">
+            <section className="flex-1 bg-white dark:bg-slate-900 overflow-y-auto scrollbar-hide relative h-full pb-16">
                 <div className="p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
@@ -115,62 +162,59 @@ export default function DayView() {
 
                         {/* Events */}
                         <div className="absolute top-0 right-0 left-[80px] h-full"> {/* This layer contains all events */}
-                            {positionedEvents.map(event => (
-                                <div
-                                    key={event.id}
-                                    onClick={() => handleEventClick(event.id.toString())}
-                                    className={`absolute inset-x-4 rounded-r-xl p-4 transition-all cursor-pointer
-                                        ${event.type === 'work' ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''}
-                                        ${event.type === 'personal' ? 'bg-orange-50 dark:bg-orange-900/20 border-l-4 border-orange-500' : ''}
-                                        ${event.type === 'social' ? 'bg-green-50 dark:bg-green-900/20 border-l-4 border-green-500' : ''}
-                                        ${event.type === 'project' ? 'bg-purple-50 dark:bg-purple-900/20 border-l-4 border-purple-500' : ''}
-                                        ${selectedEvent?.id === event.id ? 'z-50 shadow-xl' : 'z-20 hover:shadow-md'}
+                            {eventsWithLayout.map(event => {
+                                const styles = eventStyleConfig[event.type] || eventStyleConfig.work; // Fallback to work style
+
+                                return (
+                                    <div
+                                        key={event.id}
+                                        onClick={() => handleEventClick(event.id.toString())}
+                                        className={`absolute rounded-r-lg p-3 transition-all cursor-pointer border-l-4 overflow-hidden hover:opacity-100
+                                        ${styles.container}
+                                        ${selectedEvent?.id === event.id ? 'z-50 shadow-lg scale-[1.02] ring-2 ring-offset-2 dark:ring-offset-slate-900 opacity-100!' : 'opacity-90 hover:shadow-md'}
+                                        ${selectedEvent?.id === event.id ? styles.ring : ''}
                                     `}
-                                    style={{
-                                        top: `${event.top}px`,
-                                        // height: `${event.height}px`
-                                    }}
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <p className={`text-sm font-bold ${event.type === 'work' ? 'text-blue-800 dark:text-blue-300' : ''}
-                                            ${event.type === 'personal' ? 'text-orange-800 dark:text-orange-300' : ''}
-                                            ${event.type === 'social' ? 'text-green-800 dark:text-green-300' : ''}
-                                            ${event.type === 'project' ? 'text-purple-800 dark:text-purple-300' : ''}
-                                        `}>
-                                            {event.title}
-                                        </p>
-                                        {selectedEvent?.id === event.id && (
-                                            <span className="material-symbols-outlined text-primary text-sm font-bold">check_circle</span>
-                                        )}
-                                    </div>
-                                    <p className={`text-xs mt-1 ${event.type === 'work' ? 'text-blue-600 dark:text-blue-400' : ''}
-                                        ${event.type === 'personal' ? 'text-orange-600 dark:text-orange-400' : ''}
-                                        ${event.type === 'social' ? 'text-green-600 dark:text-green-400' : ''}
-                                        ${event.type === 'project' ? 'text-purple-600 dark:text-purple-400' : ''}
-                                    `}>
-                                        {event.time}
-                                    </p>
-                                    {event.participants && event.participants.length > 0 && (
-                                        <div className="mt-3 flex items-center gap-2">
-                                            <div className="flex -space-x-1.5">
-                                                {event.participants.map((participant, idx) => (
-                                                    <Avatar key={idx} className="w-6 h-6 border-2 border-white dark:border-slate-900">
-                                                        <AvatarImage src={participant.image} />
-                                                        <AvatarFallback className="text-[8px]">
-                                                            {participant.username[0]}
-                                                        </AvatarFallback>
-                                                    </Avatar>
-                                                ))}
-                                            </div>
-                                            {event.participants.length > 0 && (
-                                                <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                    +{event.participants.length} others
-                                                </span>
+                                        style={{
+                                            top: `${event.top}px`,
+                                            // height: `${event.height}px`,
+                                            left: `${event.leftPercent}%`,
+                                            width: `${event.widthPercent}%`,
+                                            zIndex: selectedEvent?.id === event.id ? 50 : event.zIndex
+                                        }}
+                                    >
+                                        <div className="flex items-center justify-between gap-2">
+                                            <p className={`text-xs font-bold truncate ${styles.title}`}>
+                                                {event.title}
+                                            </p>
+                                            {selectedEvent?.id === event.id && (
+                                                <span className="material-symbols-outlined text-primary text-sm font-bold">check_circle</span>
                                             )}
                                         </div>
-                                    )}
-                                </div>
-                            ))}
+                                        <p className={`text-xs mt-1 ${styles.time}`}>
+                                            {event.time}
+                                        </p>
+                                        {event.participants && event.participants.length > 0 && (
+                                            <div className="mt-3 flex items-center gap-2">
+                                                <div className="flex -space-x-1.5">
+                                                    {event.participants.map((participant, idx) => (
+                                                        <Avatar key={idx} className="w-6 h-6 border-2 border-white dark:border-slate-900">
+                                                            <AvatarImage src={participant.image} />
+                                                            <AvatarFallback className="text-[8px]">
+                                                                {participant.username[0]}
+                                                            </AvatarFallback>
+                                                        </Avatar>
+                                                    ))}
+                                                </div>
+                                                {event.participants.length > 0 && (
+                                                    <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
+                                                        +{event.participants.length} others
+                                                    </span>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
@@ -183,8 +227,8 @@ export default function DayView() {
             )}
 
             <Button
-                onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl lg:hidden z-25 p-0 flex items-center justify-center bg-primary text-white hover:bg-orange-600"
+                onClick={() => openModal()}
+                className="fixed cursor-pointer bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl lg:hidden z-25 p-0 flex items-center justify-center bg-primary text-white hover:bg-orange-600"
             >
                 <span className="material-symbols-outlined text-3xl font-bold">add</span>
             </Button>

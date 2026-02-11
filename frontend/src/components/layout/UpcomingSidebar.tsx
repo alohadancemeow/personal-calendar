@@ -63,6 +63,29 @@ export default function UpcomingSidebar() {
         return () => clearInterval(interval);
     }, []);
 
+    const colorMap: Record<string, { dot: string; badge: string }> = {
+        blue: {
+            dot: 'bg-blue-500 ring-4 ring-blue-500/10',
+            badge: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/40'
+        },
+        orange: {
+            dot: 'bg-orange-500 ring-4 ring-orange-500/10',
+            badge: 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 hover:bg-orange-100 dark:hover:bg-orange-900/40'
+        },
+        green: {
+            dot: 'bg-green-500 ring-4 ring-green-500/10',
+            badge: 'bg-green-50 dark:bg-green-900/30 text-green-600 dark:text-green-400 hover:bg-green-100 dark:hover:bg-green-900/40'
+        },
+        purple: {
+            dot: 'bg-purple-500 ring-4 ring-purple-500/10',
+            badge: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400 hover:bg-purple-100 dark:hover:bg-purple-900/40'
+        },
+        gray: {
+            dot: 'bg-gray-500 ring-4 ring-gray-500/10',
+            badge: 'bg-gray-50 dark:bg-gray-900/30 text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-900/40'
+        }
+    };
+
     const getEventColor = (type: string) => {
         switch (type) {
             case 'work': return 'blue';
@@ -75,6 +98,7 @@ export default function UpcomingSidebar() {
 
     const renderEventCard = (event: Event) => {
         const color = getEventColor(event.type);
+        const styles = colorMap[color] || colorMap.gray;
 
         return (
             <div
@@ -84,13 +108,13 @@ export default function UpcomingSidebar() {
             >
                 <div className="flex gap-4">
                     <div className="flex flex-col items-center pt-1">
-                        <div className={`w-2 h-2 rounded-full bg-${color}-500 ring-4 ring-${color}-500/10`}></div>
+                        <div className={`w-2 h-2 rounded-full ${styles.dot}`}></div>
                         <div className="w-0.5 flex-1 bg-slate-100 dark:bg-slate-800 my-2 rounded-full"></div>
                     </div>
                     <div className="flex-1">
                         <div className="flex justify-between items-start">
                             <h4 className="font-bold text-sm text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{event.title}</h4>
-                            <Badge variant="secondary" className={`text-[10px] font-bold px-2 py-0.5 bg-${color}-50 dark:bg-${color}-900/30 text-${color}-600 dark:text-${color}-400 rounded uppercase tracking-wider hover:bg-${color}-100 dark:hover:bg-${color}-900/40`}>{event.type}</Badge>
+                            <Badge variant="secondary" className={`text-[10px] font-bold px-2 py-0.5 rounded-2xl uppercase tracking-wider ${styles.badge}`}>{event.type}</Badge>
                         </div>
                         <p className="text-xs text-slate-500 mt-1 font-medium">{event.time}</p>
 
@@ -129,7 +153,7 @@ export default function UpcomingSidebar() {
     };
 
     return (
-        <aside className="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex flex-col overflow-hidden xl:flex h-full">
+        <aside className="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex-col hidden lg:flex overflow-hidden xl:flex h-full">
             <div className="p-6 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/30">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold tracking-tight">Upcoming</h2>
