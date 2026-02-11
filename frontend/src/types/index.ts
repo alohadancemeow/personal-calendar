@@ -3,14 +3,6 @@
 // orange -> personal
 // green -> social
 // purple -> project
-// export const EventType = {
-//     work: { value: 'work', color: 'blue' },
-//     personal: { value: 'personal', color: 'orange' },
-//     social: { value: 'social', color: 'green' },
-//     project: { value: 'project', color: 'purple' },
-// } as const;
-
-// export type EventType = typeof EventType[keyof typeof EventType];
 
 export type EventType = 'work' | 'personal' | 'social' | 'project';
 
@@ -40,6 +32,7 @@ export type Event = {
     endMinute: number; // minutes from midnight
     description?: string; // Added description field
     location?: LocationType;
+    start_date?: string; // YYYY-MM-DD
     // attachments?: { name: string; size: string; type: 'pdf' | 'image' | 'zip' }[];
 }
 

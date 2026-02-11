@@ -25,12 +25,17 @@ import { jwtDecode } from "jwt-decode";
 import { useAuthStore } from "@/store/auth";
 import { useSelectDateStore } from "@/store/selectDate";
 import { useUsersStore } from "@/store/users";
+import { useEventsStore } from "@/store/events";
+import { useSelectedEventStore } from "@/store/selectedEvent";
 import { format } from "date-fns";
+import { apiFetch } from "@/lib/api";
 
 
 export default function CreateEventModal() {
     const isOpen = useModalStore((state) => state.isOpen);
     const closeModal = useModalStore((state) => state.closeModal);
+    const eventToEdit = useModalStore((state) => state.eventToEdit);
+
     const [title, setTitle] = useState("");
     const [date, setDate] = useState("2025-12-22");
     const [startTime, setStartTime] = useState("12:00");
@@ -48,22 +53,64 @@ export default function CreateEventModal() {
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
     const users = useUsersStore((state) => state.users);
     const fetchUsers = useUsersStore((state) => state.fetchUsers);
+    const fetchEvents = useEventsStore((state) => state.fetchEvents);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
 
     useEffect(() => {
         if (isOpen) {
             fetchUsers();
-            const now = new Date();
-            setDate(format(selectedDate, "yyyy-MM-dd"));
-            setStartTime(format(now, "HH:mm"));
 
-            // Optional: Set end time to 1 hour later for better UX
-            const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-            setEndTime(format(oneHourLater, "HH:mm"));
-            setTitle("Meeting");
-            setDescription("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua");
+            if (eventToEdit) {
+                // Edit mode: populate fields
+
+                setTitle(eventToEdit.title);
+                setDate(format(selectedDate, "yyyy-MM-dd"));
+
+                // Convert startMinute/endMinute to HH:mm
+                const startH = Math.floor(eventToEdit.startMinute / 60);
+                const startM = eventToEdit.startMinute % 60;
+                setStartTime(`${startH.toString().padStart(2, '0')}:${startM.toString().padStart(2, '0')}`);
+
+                const endH = Math.floor(eventToEdit.endMinute / 60);
+                const endM = eventToEdit.endMinute % 60;
+                setEndTime(`${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`);
+
+                setEventType(eventToEdit.type);
+                setDescription(eventToEdit.description || "");
+
+                if (eventToEdit.location) {
+                    setLocationType(eventToEdit.location.type);
+
+                    if (eventToEdit.location.type === 'online') {
+                        // Cast to any because platform might capitalize differently or look different
+                        setPlatform(eventToEdit.location.platform || "");
+                        setLink(eventToEdit.location.link || "");
+                    } else {
+                        setAddress(eventToEdit.location.address || "");
+                    }
+                }
+
+                if (eventToEdit.participants) {
+                    setGuests(eventToEdit.participants);
+                } else {
+                    setGuests([]);
+                }
+
+            } else {
+                // Create mode: defaults
+                const now = new Date();
+                setDate(format(selectedDate, "yyyy-MM-dd"));
+                setStartTime(format(now, "HH:mm"));
+
+                // Optional: Set end time to 1 hour later for better UX
+                const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
+                setEndTime(format(oneHourLater, "HH:mm"));
+                setTitle("Meeting");
+                setDescription("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua");
+                setGuests(currentUser ? [currentUser] : []);
+            }
         }
-    }, [isOpen, selectedDate]);
+    }, [isOpen, selectedDate, eventToEdit, currentUser, fetchUsers]);
 
     useEffect(() => {
         if (token) {
@@ -140,20 +187,31 @@ export default function CreateEventModal() {
                 return;
             }
 
-            const response = await fetch("http://localhost:8000/events/", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify(eventData),
-            });
+            let response;
+            if (eventToEdit) {
+                response = await apiFetch(`/events/${eventToEdit.id}`, {
+                    method: "PUT",
+                    body: JSON.stringify(eventData),
+                });
+            } else {
+                response = await apiFetch("/events/", {
+                    method: "POST",
+                    body: JSON.stringify(eventData),
+                });
+            }
 
             if (!response.ok) {
-                throw new Error("Failed to create event");
+                throw new Error(eventToEdit ? "Failed to update event" : "Failed to create event");
+            }
+
+            const updatedEvent = await response.json();
+
+            if (eventToEdit) {
+                useSelectedEventStore.getState().setSelectedEvent(updatedEvent);
             }
 
             closeModal();
+            fetchEvents(selectedDate);
         } catch (error) {
             console.error(error);
         }
@@ -165,7 +223,7 @@ export default function CreateEventModal() {
                 <DialogHeader className="p-6 border-b border-gray-50 dark:border-slate-800">
                     <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
                         <span className="material-symbols-outlined text-primary">event</span>
-                        Create New Event
+                        {eventToEdit ? 'Edit Event' : 'Create New Event'}
                     </DialogTitle>
                 </DialogHeader>
 
@@ -229,7 +287,7 @@ export default function CreateEventModal() {
                                         />
                                         <Label
                                             htmlFor="r-purple"
-                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-purple-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-purple-500 transition-all cursor-pointer"
+                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-blue-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-blue-500 transition-all cursor-pointer"
                                         ></Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
@@ -251,7 +309,7 @@ export default function CreateEventModal() {
                                         />
                                         <Label
                                             htmlFor="r-blue"
-                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-blue-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-blue-500 transition-all cursor-pointer"
+                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-green-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-green-500 transition-all cursor-pointer"
                                         ></Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
@@ -262,7 +320,7 @@ export default function CreateEventModal() {
                                         />
                                         <Label
                                             htmlFor="r-emerald"
-                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-emerald-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-emerald-500 transition-all cursor-pointer"
+                                            className="w-7 h-7 sm:w-6 sm:h-6 rounded-full bg-purple-500 ring-offset-2 peer-data-[state=checked]:ring-2 ring-purple-500 transition-all cursor-pointer"
                                         ></Label>
                                     </div>
                                 </RadioGroup>
@@ -355,9 +413,9 @@ export default function CreateEventModal() {
                                             <SelectValue placeholder="Select platform" />
                                         </SelectTrigger>
                                         <SelectContent>
-                                            <SelectItem value="zoom">Zoom</SelectItem>
-                                            <SelectItem value="meet">Google Meet</SelectItem>
-                                            <SelectItem value="teams">Microsoft Teams</SelectItem>
+                                            <SelectItem value="Zoom">Zoom</SelectItem>
+                                            <SelectItem value="Google Meet">Google Meet</SelectItem>
+                                            <SelectItem value="Microsoft Teams">Microsoft Teams</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -527,7 +585,7 @@ export default function CreateEventModal() {
                             className="w-full cursor-pointer sm:flex-1 py-6 rounded-2xl font-semibold text-white bg-primary hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
                             type="submit"
                         >
-                            <span>Save Event</span>
+                            <span>{eventToEdit ? "Update Event" : "Save Event"}</span>
                         </Button>
                     </DialogFooter>
                 </form>

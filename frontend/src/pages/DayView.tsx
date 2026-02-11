@@ -5,13 +5,13 @@ import UpcomingSidebar from '../components/layout/UpcomingSidebar';
 import EventDetailsSidebar from '../components/layout/EventDetailsSidebar';
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { type Event } from '@/types';
 import { useSelectDateStore } from '@/store/selectDate';
 import { useSelectedEventStore } from '@/store/selectedEvent';
 import { useAuthStore } from '@/store/auth';
+import { useEventsStore } from '@/store/events';
 
 export default function DayView() {
-    const [events, setEvents] = useState<Event[]>([]);
+    const { events, fetchEvents } = useEventsStore();
 
     const { setIsModalOpen } = useOutletContext<{ setIsModalOpen: (open: boolean) => void }>();
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
@@ -20,33 +20,13 @@ export default function DayView() {
 
     const token = useAuthStore((state) => state.token);
 
-    console.log(events, 'events');
+    // console.log(events, 'events');
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const formattedDate = format(selectedDate, "yyyy-MM-dd");
-                const response = await fetch(`http://localhost:8000/events/?date=${formattedDate}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                });
-
-                if (!response.ok) {
-                    throw new Error("Failed to fetch events");
-                }
-
-                const data = await response.json();
-                setEvents(data);
-            } catch (error) {
-                console.error(error);
-            }
-        };
-
         if (token) {
-            fetchEvents();
+            fetchEvents(selectedDate);
         }
-    }, [token, selectedDate]);
+    }, [token, selectedDate, fetchEvents]);
 
     const handleEventClick = (id: string) => {
         if (selectedEvent?.id?.toString() === id) {
@@ -92,7 +72,7 @@ export default function DayView() {
 
     return (
         <div className="flex flex-1 overflow-hidden h-full">
-            <section className="flex-1 bg-white dark:bg-slate-900 overflow-y-auto scrollbar-hide relative h-full">
+            <section className="flex-1 bg-white dark:bg-slate-900 overflow-y-auto scrollbar-hide relative h-full pb-15">
                 <div className="p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>

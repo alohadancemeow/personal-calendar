@@ -4,16 +4,21 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { useSelectedEventStore } from "@/store/selectedEvent";
 import { useModalStore } from "@/store/modal";
+import { format } from "date-fns";
+import { useSelectDateStore } from "@/store/selectDate";
 
 export default function EventDetailsSidebar() {
     const selectedEvent = useSelectedEventStore((state) => state.selectedEvent);
     const clearSelectedEvent = useSelectedEventStore((state) => state.clearSelectedEvent);
+    const { openModal } = useModalStore();
     const onClose = useModalStore((state) => state.closeModal);
-
+    const selectedDate = useSelectDateStore((state) => state.selectedDate);
 
     if (!selectedEvent) {
         return null;
     }
+
+    const displayDate = selectedEvent.start_date ? new Date(selectedEvent.start_date) : selectedDate;
 
     return (
         <aside className="w-[400px] border-l border-slate-200 dark:border-slate-800 bg-card-light dark:bg-card-dark flex-col hidden xl:flex">
@@ -25,7 +30,11 @@ export default function EventDetailsSidebar() {
                          ${!selectedEvent.type ? 'from-orange-400 to-primary' : ''}
                       `}>
                 <div className="absolute top-4 right-4 flex gap-2">
-                    <Button size="icon" className="bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl text-white transition-all border-none">
+                    <Button
+                        size="icon"
+                        onClick={() => openModal(selectedEvent)}
+                        className="bg-white/20 cursor-pointer hover:bg-white/30 backdrop-blur-md rounded-xl text-white transition-all border-none"
+                    >
                         <span className="material-symbols-outlined">edit</span>
                     </Button>
                     <Button
@@ -34,13 +43,15 @@ export default function EventDetailsSidebar() {
                             clearSelectedEvent();
                             onClose()
                         }}
-                        className="bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-xl text-white transition-all border-none"
+                        className="bg-white/20 cursor-pointer hover:bg-white/30 backdrop-blur-md rounded-xl text-white transition-all border-none"
                     >
                         <span className="material-symbols-outlined">close</span>
                     </Button>
                 </div>
                 <h1 className="text-white text-2xl font-bold">{selectedEvent.title}</h1>
-                <p className="text-white/80 text-sm mt-1">Monday, Dec 22 · {selectedEvent.time}</p>
+                <p className="text-white/80 text-sm mt-1">
+                    {format(displayDate, 'EEEE, MMM d')} · {selectedEvent.time}
+                </p>
             </div>
 
             <ScrollArea className="flex-1">
