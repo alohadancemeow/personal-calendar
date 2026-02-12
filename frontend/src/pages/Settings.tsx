@@ -91,14 +91,14 @@ export default function Settings() {
                         <CardContent className="space-y-6">
                             <div className="flex flex-col sm:flex-row items-center gap-6">
                                 <div className="relative">
-                                    <Avatar className="w-24 h-24 rounded-2xl ring-4 ring-slate-50 dark:ring-slate-800">
+                                    <Avatar className="w-24 h-24 rounded-full ring-4 ring-slate-50 dark:ring-slate-800">
                                         <AvatarImage
                                             src={`${user?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuB4tiRKuSLvEdDsAQlk5Cre0tNZEZ6lVP5qHNOr2HnqpeQqO_lLCmBLeEG61w1LoI2utdaXwnx9RrHnkl9fc5ZI9jWqapawGsrscrF2pfRbWnAOZkpXauDCb38Y6LhfQeWa3iNyDryVUX5W1z7awikbI4Dw1z8ZZ0kB1nDQZD-IUpethnw42WceSAuKcF-mBxVA342_0sHgma9ixtv6ezvkM8hTwp8M0bVYOq7q3RTxB2HsK89uqDCN9Ka0QQzcqHJI7Ae8niVWi6g"}`}
                                             className="object-cover"
                                         />
                                         <AvatarFallback>SO</AvatarFallback>
                                     </Avatar>
-                                    <Button size="icon" className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full shadow-lg hover:scale-110 transition-transform">
+                                    <Button size="icon" className="absolute -bottom-2 right-1 h-8 w-8 rounded-full shadow-lg hover:scale-110 transition-transform">
                                         <span className="material-symbols-outlined text-sm">edit</span>
                                     </Button>
                                 </div>

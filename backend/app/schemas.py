@@ -8,12 +8,17 @@ from enum import Enum
 class UserCreate(BaseModel):
     username: str
     email: EmailStr
-    password: str = Field(..., max_length=50)
+    password: Optional[str] = Field(
+        None, max_length=50
+    )  # Make password optional for OAuth
     image: Optional[str] = None  # Optional image URL
+    google_id: Optional[str] = None
+    github_id: Optional[str] = None
+    provider: Optional[str] = None  # 'google', 'github', or 'local'
 
 
 class UserInDB(UserCreate):
-    hashed_password: str
+    hashed_password: Optional[str] = None
 
 
 class UserResponse(BaseModel):

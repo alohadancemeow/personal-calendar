@@ -12,13 +12,15 @@ services:
       - db_data:/var/lib/postgresql/data
   api:
     build: .
-    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     volumes:
       - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
+    env_file:
+      - .env
     environment:
       # These will be loaded from the .env file automatically by docker-compose
       DATABASE_URL: ${DATABASE_URL}

@@ -2,8 +2,8 @@ from datetime import date
 from sqlalchemy.orm import Session
 from typing import List, Optional
 
-import schemas
-from database import DBEvent, DBUser
+import app.schemas as schemas
+from app.models.models import DBEvent, DBUser
 
 
 # --- User CRUD ---
@@ -11,8 +11,19 @@ def get_user(db: Session, user_id: int) -> Optional[DBUser]:
     return db.query(DBUser).filter(DBUser.id == user_id).first()
 
 
-def get_user_by_email(db: Session, email: str) -> Optional[DBUser]:
-    return db.query(DBUser).filter(DBUser.email == email).first()
+def get_user_by_email(
+    db: Session,
+    email: str,
+    provider: Optional[str] = None,
+    provider_id: Optional[str] = None,
+) -> Optional[DBUser]:
+    query = db.query(DBUser).filter(DBUser.email == email)
+    if provider and provider_id:
+        if provider == "google":
+            query = query.filter(DBUser.google_id == provider_id)
+        elif provider == "github":
+            query = query.filter(DBUser.github_id == provider_id)
+    return query.first()
 
 
 def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[DBUser]:
@@ -20,18 +31,30 @@ def get_users(db: Session, skip: int = 0, limit: int = 100) -> List[DBUser]:
 
 
 def create_user(db: Session, user: schemas.UserCreate) -> DBUser:
-    # In a real app, you'd hash the password here
-    fake_hashed_password = user.password + "notreallyhashed"
+    hashed_password = getattr(user, "hashed_password", None)
     db_user = DBUser(
         username=user.username,
         email=user.email,
-        hashed_password=fake_hashed_password,
+        hashed_password=hashed_password,
         image=user.image,
+        google_id=user.google_id,
+        github_id=user.github_id,
+        provider=user.provider,
     )
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
     return db_user
+
+
+def get_user_by_oauth_id(
+    db: Session, provider: str, provider_id: str
+) -> Optional[DBUser]:
+    if provider == "google":
+        return db.query(DBUser).filter(DBUser.google_id == provider_id).first()
+    elif provider == "github":
+        return db.query(DBUser).filter(DBUser.github_id == provider_id).first()
+    return None
 
 
 # --- Event CRUD ---

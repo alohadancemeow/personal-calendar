@@ -1,14 +1,14 @@
-from typing import Optional
 from datetime import date
-from typing import List
+from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-import crud
-import schemas
-from database import DBUser, get_db
-from routers.users import get_current_user
+import app.crud as crud
+import app.schemas as schemas
+from app.db.session import get_db
+from app.models.models import DBUser
+from app.routers.users import get_current_user
 
 router = APIRouter()
 

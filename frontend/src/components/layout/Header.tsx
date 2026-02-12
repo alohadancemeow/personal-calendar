@@ -6,6 +6,8 @@ import { useAuthStore } from "@/store/auth";
 export default function Header() {
     const user = useAuthStore(state => state.user);
 
+    console.log(user);
+
     const toggleDarkMode = () => {
         document.documentElement.classList.toggle('dark');
         if (document.documentElement.classList.contains('dark')) {
@@ -53,7 +55,7 @@ export default function Header() {
                                 <p className="text-sm font-bold">{user?.username}</p>
                             </div>
                             <Link to="/settings">
-                                <Avatar className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5">
+                                <Avatar className="w-10 h-10 rounded-full border-2 border-primary/20">
                                     <AvatarImage src={`${user?.image}`} />
                                     <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
                                 </Avatar>
