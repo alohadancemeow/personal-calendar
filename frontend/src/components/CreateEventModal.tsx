@@ -525,7 +525,7 @@ export default function CreateEventModal() {
                         open={isGuestDialogOpen}
                         onOpenChange={setIsGuestDialogOpen}
                     >
-                        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 rounded-3xl">
+                        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 rounded-xl">
                             <DialogHeader>
                                 <DialogTitle>Select Guests</DialogTitle>
                             </DialogHeader>

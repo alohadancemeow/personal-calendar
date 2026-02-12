@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { format } from "date-fns";
+import { format, addDays } from "date-fns";
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import UpcomingSidebar from '../components/layout/UpcomingSidebar';
 import EventDetailsSidebar from '../components/layout/EventDetailsSidebar';
 import { Button } from "@/components/ui/button";
@@ -43,8 +45,21 @@ export default function DayView() {
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
     const selectedEvent = useSelectedEventStore((state) => state.selectedEvent);
     const setSelectedEvent = useSelectedEventStore((state) => state.setSelectedEvent);
+    const setSelectedDate = useSelectDateStore((state) => state.setSelectedDate);
+
     const openModal = useModalStore((state) => state.openModal);
     const token = useAuthStore((state) => state.token);
+
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+    const handlePrevDay = () => {
+        setSelectedDate(addDays(selectedDate, -1));
+    };
+
+    const handleNextDay = () => {
+        setSelectedDate(addDays(selectedDate, 1));
+    };
+
 
     useEffect(() => {
         if (token) {
@@ -123,7 +138,19 @@ export default function DayView() {
                 <div className="p-8">
                     <div className="flex items-center justify-between mb-8">
                         <div>
-                            <h2 className="text-3xl font-bold tracking-tight">{format(selectedDate, "EEEE, MMM d")}</h2>
+                            <div className="flex items-center gap-2">
+                                {!isDesktop && (
+                                    <Button variant="ghost" size="icon" className="-ml-2 h-8 w-8" onClick={handlePrevDay}>
+                                        <ChevronLeft className="h-6! w-6!" />
+                                    </Button>
+                                )}
+                                <h2 className="text-3xl font-bold tracking-tight">{format(selectedDate, "EEEE, MMM d")}</h2>
+                                {!isDesktop && (
+                                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={handleNextDay}>
+                                        <ChevronRight className="h-6! w-6!" />
+                                    </Button>
+                                )}
+                            </div>
                             <p className="text-slate-500 dark:text-slate-400">Today is your busiest day this week.</p>
                         </div>
                     </div>
@@ -132,7 +159,7 @@ export default function DayView() {
                         {/* Current Time Indicator */}
                         {isVisible && (
                             <div
-                                className="absolute w-full left-0 flex items-center z-50 pointer-events-none transition-all duration-1000 ease-in-out"
+                                className="absolute w-full left-0 flex items-center z-30 pointer-events-none transition-all duration-1000 ease-in-out"
                                 style={{ top: `${indicatorTop}px` }}
                             >
                                 <div className="w-3 h-3 rounded-full bg-red-500 -ml-1.5"></div>
@@ -196,7 +223,7 @@ export default function DayView() {
                                         {event.participants && event.participants.length > 0 && (
                                             <div className="mt-3 flex items-center gap-2">
                                                 <div className="flex -space-x-1.5">
-                                                    {event.participants.map((participant, idx) => (
+                                                    {event.participants.slice(0, 3).map((participant, idx) => (
                                                         <Avatar key={idx} className="w-6 h-6 border-2 border-white dark:border-slate-900">
                                                             <AvatarImage src={participant.image} />
                                                             <AvatarFallback className="text-[8px]">
@@ -207,7 +234,7 @@ export default function DayView() {
                                                 </div>
                                                 {event.participants.length > 0 && (
                                                     <span className="text-xs font-medium text-slate-600 dark:text-slate-400">
-                                                        +{event.participants.length} others
+                                                        {event.participants.length > 3 && `+${event.participants.length - 3} others`}
                                                     </span>
                                                 )}
                                             </div>
@@ -228,7 +255,7 @@ export default function DayView() {
 
             <Button
                 onClick={() => openModal()}
-                className="fixed cursor-pointer bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl lg:hidden z-25 p-0 flex items-center justify-center bg-primary text-white hover:bg-orange-600"
+                className="fixed cursor-pointer bottom-6 right-6 w-14 h-14 rounded-full shadow-2xl lg:hidden z-50 p-0 flex items-center justify-center bg-primary text-white hover:bg-orange-600"
             >
                 <span className="material-symbols-outlined text-3xl font-bold">add</span>
             </Button>

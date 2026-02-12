@@ -19,6 +19,14 @@ export default function Settings() {
 
     return (
         <div className="max-w-6xl mx-auto px-6 py-10 w-full overflow-y-auto">
+
+            <div className="flex items-center gap-3 bg-amber-50/50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg px-4 py-3 mb-6 text-sm text-amber-900 dark:text-amber-200">
+                <span className="material-symbols-outlined text-amber-500 text-xl">handyman</span>
+                <p>
+                    <span className="font-semibold">Under Development:</span> This settings page is currently being built. Some features may not be fully functional.
+                </p>
+            </div>
+
             <div className="mb-8">
                 <h1 className="text-3xl font-bold tracking-tight">Account Settings</h1>
                 <p className="text-slate-500 dark:text-slate-400 mt-1">Manage your personal information and calendar preferences.</p>
@@ -106,15 +114,15 @@ export default function Settings() {
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Full Name</Label>
-                                    <Input defaultValue={`${user?.username || "Stephen Oladipo"}`} />
+                                    <Input defaultValue={`${user?.username || "Stephen Oladipo"}`} disabled />
                                 </div>
                                 <div className="space-y-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Email Address</Label>
-                                    <Input type="email" defaultValue={`${user?.email}`} value={user?.email} />
+                                    <Input type="email" defaultValue={`${user?.email}`} disabled />
                                 </div>
                                 <div className="space-y-2 sm:col-span-2">
                                     <Label className="text-slate-600 dark:text-slate-400">Bio</Label>
-                                    <Textarea placeholder="Tell us about yourself..." className="resize-none" rows={3} />
+                                    <Textarea placeholder="Tell us about yourself..." className="resize-none" rows={3} disabled />
                                 </div>
                             </div>
                         </CardContent>
@@ -182,6 +190,7 @@ export default function Settings() {
                             </div>
                         </CardContent>
                     </Card>
+
 
                     <div className="flex items-center justify-end gap-3 pt-4">
                         <Button variant="ghost" size="lg">Cancel</Button>

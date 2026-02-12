@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
 import { cn } from "@/lib/utils"
@@ -62,9 +62,6 @@ export function LoginForm({
             const token = data.access_token;
 
             const decodedToken = jwtDecode<DecodedToken>(token);
-
-            console.log(decodedToken, 'decodedToken');
-
             const user = { id: decodedToken.sub, username: decodedToken.username, email: decodedToken.email, image: decodedToken.image };
 
             login(user, token);
@@ -73,6 +70,11 @@ export function LoginForm({
             setError(err.message);
         }
     };
+
+    useEffect(() => {
+        setEmail('test@gmail.com');
+        setPassword('123456');
+    }, []);
 
     return (
         <div className={cn("flex flex-col gap-6", className)} {...props}>
