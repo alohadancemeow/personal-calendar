@@ -5,7 +5,7 @@ import {
     DialogTitle,
     DialogFooter,
 } from "@/components/ui/dialog";
-import { useState, useEffect, type ChangeEvent } from "react";
+import { useState, type ChangeEvent } from "react";
 import {
     Select,
     SelectContent,
@@ -20,133 +20,47 @@ import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { useModalStore } from "@/store/modal";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { type User, type DecodedToken } from "@/types";
-import { jwtDecode } from "jwt-decode";
-import { useAuthStore } from "@/store/auth";
-import { useSelectDateStore } from "@/store/selectDate";
-import { useUsersStore } from "@/store/users";
 import { useEventsStore } from "@/store/events";
 import { useSelectedEventStore } from "@/store/selectedEvent";
-import { format } from "date-fns";
 import { apiFetch } from "@/lib/api";
+import { useEventForm } from "@/hooks/use-event-form";
+import { useSelectDateStore } from "@/store/selectDate";
+import GuestSelectionDialog from "./guest-selection-dialog/GuestSelectionDialog";
 
-
+/**
+ * A modal component for creating and editing events.
+ * It uses the `useEventForm` hook to manage form state and logic.
+ */
 export default function CreateEventModal() {
-    const isOpen = useModalStore((state) => state.isOpen);
-    const closeModal = useModalStore((state) => state.closeModal);
-    const eventToEdit = useModalStore((state) => state.eventToEdit);
+    const { isOpen, closeModal, eventToEdit } = useModalStore();
+    const { fetchEvents } = useEventsStore();
+    const { setSelectedEvent } = useSelectedEventStore();
+    const selectedDate = useSelectDateStore((state) => state.selectedDate);
 
-    const [title, setTitle] = useState("");
-    const [date, setDate] = useState("2025-12-22");
-    const [startTime, setStartTime] = useState("12:00");
-    const [endTime, setEndTime] = useState("13:00");
-    const [eventType, setEventType] = useState("personal");
-    const [description, setDescription] = useState("");
-    const [locationType, setLocationType] = useState("online");
-    const [platform, setPlatform] = useState("");
-    const [link, setLink] = useState("");
-    const [address, setAddress] = useState("");
-    const [guests, setGuests] = useState<User[]>([]);
+    // The useEventForm hook encapsulates the complex form logic.
+    const {
+        title, setTitle,
+        date, setDate,
+        startTime, setStartTime,
+        endTime, setEndTime,
+        eventType, setEventType,
+        description, setDescription,
+        locationType, setLocationType,
+        platform, setPlatform,
+        link, setLink,
+        address, setAddress,
+        guests,
+        currentUser,
+        users,
+        toggleGuest
+    } = useEventForm();
+
     const [isGuestDialogOpen, setIsGuestDialogOpen] = useState(false);
 
-    const token = useAuthStore((state) => state.token);
-    const selectedDate = useSelectDateStore((state) => state.selectedDate);
-    const users = useUsersStore((state) => state.users);
-    const fetchUsers = useUsersStore((state) => state.fetchUsers);
-    const fetchEvents = useEventsStore((state) => state.fetchEvents);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-    useEffect(() => {
-        if (isOpen) {
-            fetchUsers();
-
-            if (eventToEdit) {
-                // Edit mode: populate fields
-
-                setTitle(eventToEdit.title);
-                setDate(format(selectedDate, "yyyy-MM-dd"));
-
-                // Convert startMinute/endMinute to HH:mm
-                const startH = Math.floor(eventToEdit.startMinute / 60);
-                const startM = eventToEdit.startMinute % 60;
-                setStartTime(`${startH.toString().padStart(2, '0')}:${startM.toString().padStart(2, '0')}`);
-
-                const endH = Math.floor(eventToEdit.endMinute / 60);
-                const endM = eventToEdit.endMinute % 60;
-                setEndTime(`${endH.toString().padStart(2, '0')}:${endM.toString().padStart(2, '0')}`);
-
-                setEventType(eventToEdit.type);
-                setDescription(eventToEdit.description || "");
-
-                if (eventToEdit.location) {
-                    setLocationType(eventToEdit.location.type);
-
-                    if (eventToEdit.location.type === 'online') {
-                        // Cast to any because platform might capitalize differently or look different
-                        setPlatform(eventToEdit.location.platform || "");
-                        setLink(eventToEdit.location.link || "");
-                    } else {
-                        setAddress(eventToEdit.location.address || "");
-                    }
-                }
-
-                if (eventToEdit.participants) {
-                    setGuests(eventToEdit.participants);
-                } else {
-                    setGuests([]);
-                }
-
-            } else {
-                // Create mode: defaults
-                const now = new Date();
-                setDate(format(selectedDate, "yyyy-MM-dd"));
-                setStartTime(format(now, "HH:mm"));
-
-                // Optional: Set end time to 1 hour later for better UX
-                const oneHourLater = new Date(now.getTime() + 60 * 60 * 1000);
-                setEndTime(format(oneHourLater, "HH:mm"));
-                setTitle("Meeting");
-                setDescription("lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod tempor incididunt ut labore et dolore magna aliqua");
-                setGuests(currentUser ? [currentUser] : []);
-            }
-        }
-    }, [isOpen, selectedDate, eventToEdit, currentUser, fetchUsers]);
-
-    useEffect(() => {
-        if (token) {
-            try {
-                const decoded = jwtDecode<DecodedToken>(token);
-                const user: User = {
-                    id: decoded.sub,
-                    username: decoded.username,
-                    email: decoded.email,
-                    image: decoded.image || "",
-                };
-                setCurrentUser(user);
-
-                setGuests((prev) => {
-                    const exists = prev.some((g) => g.id === user.id);
-                    if (!exists) {
-                        return [user, ...prev];
-                    }
-                    return prev;
-                });
-            } catch (error) {
-                console.error("Failed to decode token", error);
-            }
-        }
-    }, [token]);
-
-    const toggleGuest = (user: User) => {
-        if (currentUser && user.id === currentUser.id) return;
-
-        if (guests.find((g) => g.id === user.id)) {
-            setGuests(guests.filter((g) => g.id !== user.id));
-        } else {
-            setGuests([...guests, user]);
-        }
-    };
-
+    /**
+     * Handles the form submission for both creating and updating events.
+     * @param e - The form submission event.
+     */
     const handleCreateEvent = async (e: ChangeEvent<HTMLFormElement>) => {
         e.preventDefault();
 
@@ -177,6 +91,7 @@ export default function CreateEventModal() {
         };
 
         try {
+            // Basic time validation.
             if (startHour < 8 || startHour > 18 || (startHour === 18 && startMinute > 0)) {
                 alert("Start time must be between 08:00 and 18:00");
                 return;
@@ -189,11 +104,13 @@ export default function CreateEventModal() {
 
             let response;
             if (eventToEdit) {
+                // Update existing event.
                 response = await apiFetch(`/events/${eventToEdit.id}`, {
                     method: "PUT",
                     body: JSON.stringify(eventData),
                 });
             } else {
+                // Create new event.
                 response = await apiFetch("/events/", {
                     method: "POST",
                     body: JSON.stringify(eventData),
@@ -207,11 +124,11 @@ export default function CreateEventModal() {
             const updatedEvent = await response.json();
 
             if (eventToEdit) {
-                useSelectedEventStore.getState().setSelectedEvent(updatedEvent);
+                setSelectedEvent(updatedEvent);
             }
 
             closeModal();
-            fetchEvents(selectedDate);
+            fetchEvents(selectedDate); // Refresh events for the current view.
         } catch (error) {
             console.error(error);
         }
@@ -231,6 +148,7 @@ export default function CreateEventModal() {
                     className="p-6 space-y-6 overflow-y-auto max-h-[70vh] no-scrollbar"
                     onSubmit={handleCreateEvent}
                 >
+                    {/* Form fields are bound to the state from the useEventForm hook. */}
                     <div className="space-y-1.5">
                         <Label
                             htmlFor="title"
@@ -385,7 +303,6 @@ export default function CreateEventModal() {
 
                     <div className="space-y-4">
                         <div className="space-y-1.5">
-                            {/* <Label className="text-sm font-semibold text-gray-700 dark:text-gray-300 ml-1">Location Type</Label> */}
                             <RadioGroup
                                 value={locationType}
                                 onValueChange={setLocationType}
@@ -521,56 +438,14 @@ export default function CreateEventModal() {
                         </div>
                     </div>
 
-                    <Dialog
-                        open={isGuestDialogOpen}
+                    <GuestSelectionDialog
+                        isOpen={isGuestDialogOpen}
                         onOpenChange={setIsGuestDialogOpen}
-                    >
-                        <DialogContent className="sm:max-w-md bg-white dark:bg-slate-900 border-gray-100 dark:border-slate-800 rounded-xl">
-                            <DialogHeader>
-                                <DialogTitle>Select Guests</DialogTitle>
-                            </DialogHeader>
-                            <div className="py-4 space-y-2 max-h-[60vh] overflow-y-auto">
-                                {users
-                                    .filter((user) => user.id !== currentUser?.id)
-                                    .map((user) => {
-                                        const isSelected = guests.some((g) => g.id === user.id);
-                                        return (
-                                            <div
-                                                key={user.id}
-                                                className={`flex items-center justify-between p-3 rounded-xl transition-colors cursor-pointer ${isSelected
-                                                    ? "bg-primary/10"
-                                                    : "hover:bg-slate-50 dark:hover:bg-slate-800"
-                                                    }`}
-                                                onClick={() => toggleGuest(user)}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <Avatar>
-                                                        <AvatarImage src={user.image} />
-                                                        <AvatarFallback>{user.username[0]}</AvatarFallback>
-                                                    </Avatar>
-                                                    <span className="font-medium">
-                                                        {user.username}
-                                                    </span>
-                                                </div>
-                                                {isSelected && (
-                                                    <span className="material-symbols-outlined text-primary">
-                                                        check_circle
-                                                    </span>
-                                                )}
-                                            </div>
-                                        );
-                                    })}
-                            </div>
-                            <DialogFooter>
-                                <Button
-                                    onClick={() => setIsGuestDialogOpen(false)}
-                                    className="w-full"
-                                >
-                                    Done
-                                </Button>
-                            </DialogFooter>
-                        </DialogContent>
-                    </Dialog>
+                        users={users}
+                        guests={guests}
+                        currentUser={currentUser}
+                        toggleGuest={toggleGuest}
+                    />
 
                     <DialogFooter className="flex flex-col sm:flex-row items-center gap-3 pt-4 sm:space-x-0">
                         <Button

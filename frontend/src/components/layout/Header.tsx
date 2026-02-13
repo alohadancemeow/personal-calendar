@@ -6,8 +6,6 @@ import { useAuthStore } from "@/store/auth";
 export default function Header() {
     const user = useAuthStore(state => state.user);
 
-    console.log(user);
-
     const toggleDarkMode = () => {
         document.documentElement.classList.toggle('dark');
         if (document.documentElement.classList.contains('dark')) {
