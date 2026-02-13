@@ -23,8 +23,8 @@ auth.set_oauth_client(oauth)
 auth.register_oauth_clients()
 
 origins = [
-    "http://localhost:5173",
-    "http://localhost:5173/",
+    settings.FRONTEND_URL,
+    f"{settings.FRONTEND_URL}/",
 ]
 
 app.add_middleware(
