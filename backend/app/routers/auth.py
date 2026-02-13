@@ -43,7 +43,7 @@ def register_oauth_clients():
         authorize_url="https://github.com/login/oauth/authorize",
         api_base_url="https://api.github.com/",
         client_kwargs={"scope": "user:email"},
-        redirect_uri="http://localhost:8000/auth/github",
+        redirect_uri=f"{settings.BACKEND_URL}/auth/github",
     )
 
 
@@ -106,7 +106,7 @@ async def auth_google(request: Request, db: Session = Depends(get_db)):
     )
 
     return RedirectResponse(
-        url=f"http://localhost:5173/login?access_token={access_token}"
+        url=f"{settings.FRONTEND_URL}/login?access_token={access_token}"
     )
 
 
@@ -179,5 +179,5 @@ async def auth_github(request: Request, db: Session = Depends(get_db)):
     )
 
     return RedirectResponse(
-        url=f"http://localhost:5173/login?access_token={access_token}"
+        url=f"{settings.FRONTEND_URL}/login?access_token={access_token}"
     )
