@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[dev]
+  command = "npm run dev"
+  port = 5173
+  targetPort = 8080 # Proxy to backend during local dev if needed, though Vite proxy is usually better
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
