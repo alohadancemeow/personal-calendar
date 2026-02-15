@@ -12,6 +12,7 @@ import {
     FieldSeparator,
 } from "@/components/ui/field"
 import { useAuthStore } from '@/store/auth';
+import { apiFetch } from '@/lib/api';
 import { jwtDecode } from 'jwt-decode';
 import type { DecodedToken } from '@/types';
 import { OAuthButtons } from "@/components/OAuthButtons";
@@ -49,11 +50,8 @@ export function SignupForm({
         }
 
         try {
-            const response = await fetch('http://localhost:8000/register', {
+            const response = await apiFetch('/register', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ username: name, email, password }),
             });
 
@@ -67,7 +65,7 @@ export function SignupForm({
             formData.append('username', email);
             formData.append('password', password);
 
-            const loginResponse = await fetch('http://localhost:8000/token', {
+            const loginResponse = await apiFetch('/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

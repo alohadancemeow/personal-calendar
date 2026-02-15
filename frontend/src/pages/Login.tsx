@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/store/auth';
+import { apiFetch } from '@/lib/api';
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
@@ -46,7 +47,7 @@ export function LoginForm({
             formData.append('username', email); // FastAPI expects 'username' for the email field in /token
             formData.append('password', password);
 
-            const response = await fetch('http://localhost:8000/token', {
+            const response = await apiFetch('/token', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

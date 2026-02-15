@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { type User } from '@/types';
+import { apiFetch } from '@/lib/api';
 
 interface UsersState {
     users: User[];
@@ -15,11 +16,9 @@ export const useUsersStore = create<UsersState>((set) => ({
     fetchUsers: async () => {
         set({ isLoading: true, error: null });
         try {
-            const response = await fetch('http://localhost:8000/users/', {
+            const response = await apiFetch('/users/', {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                // apiFetch handles Content-Type: application/json by default
             });
 
             if (!response.ok) {
