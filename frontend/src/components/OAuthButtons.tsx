@@ -1,13 +1,15 @@
 import { Button } from "@/components/ui/button"
 import { Field } from "@/components/ui/field"
 
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export function OAuthButtons() {
     const handleGoogleLogin = () => {
-        window.location.href = 'http://localhost:8000/auth/login/google';
+        window.location.href = `${BASE_URL}/auth/login/google`;
     };
 
     const handleGithubLogin = () => {
-        window.location.href = 'http://localhost:8000/auth/login/github';
+        window.location.href = `${BASE_URL}/auth/login/github`;
     };
 
     return (

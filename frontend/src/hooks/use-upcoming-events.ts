@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { type Event } from "@/types";
 import { apiFetch } from "@/lib/api";
 import { format, addDays } from "date-fns";
+import { useEventsStore } from "@/store/events";
 
 /**
  * A custom hook to fetch and manage upcoming events for today and tomorrow.
@@ -51,12 +52,14 @@ export function useUpcomingEvents() {
         }
     }, []);
 
+    const refreshTrigger = useEventsStore((state) => state.refreshTrigger);
+
     // Effect to fetch events on mount and set up a polling interval.
     useEffect(() => {
         fetchUpcomingEvents();
         const interval = setInterval(fetchUpcomingEvents, 60000); // Refresh every minute.
         return () => clearInterval(interval);
-    }, [fetchUpcomingEvents]);
+    }, [fetchUpcomingEvents, refreshTrigger]);
 
     return { todayEvents, tomorrowEvents, loading };
 }

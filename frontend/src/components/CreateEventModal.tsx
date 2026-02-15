@@ -33,7 +33,7 @@ import GuestSelectionDialog from "./guest-selection-dialog/GuestSelectionDialog"
  */
 export default function CreateEventModal() {
     const { isOpen, closeModal, eventToEdit } = useModalStore();
-    const { fetchEvents } = useEventsStore();
+    const { fetchEvents, triggerRefresh } = useEventsStore();
     const { setSelectedEvent } = useSelectedEventStore();
     const selectedDate = useSelectDateStore((state) => state.selectedDate);
 
@@ -56,6 +56,7 @@ export default function CreateEventModal() {
     } = useEventForm();
 
     const [isGuestDialogOpen, setIsGuestDialogOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     /**
      * Handles the form submission for both creating and updating events.
@@ -102,6 +103,8 @@ export default function CreateEventModal() {
                 return;
             }
 
+            setIsLoading(true);
+
             let response;
             if (eventToEdit) {
                 // Update existing event.
@@ -129,8 +132,11 @@ export default function CreateEventModal() {
 
             closeModal();
             fetchEvents(selectedDate); // Refresh events for the current view.
+            triggerRefresh(); // Refresh upcoming events sidebar.
         } catch (error) {
             console.error(error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -459,8 +465,15 @@ export default function CreateEventModal() {
                         <Button
                             className="w-full cursor-pointer sm:flex-1 py-6 rounded-xl font-semibold text-white bg-primary hover:bg-orange-600 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2"
                             type="submit"
+                            disabled={isLoading}
                         >
-                            <span>{eventToEdit ? "Update Event" : "Save Event"}</span>
+                            <span>
+                                {isLoading
+                                    ? "Saving..."
+                                    : eventToEdit
+                                    ? "Update Event"
+                                    : "Save Event"}
+                            </span>
                         </Button>
                     </DialogFooter>
                 </form>

@@ -36,6 +36,7 @@ export function SignupForm({
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     const login = useAuthStore((state) => state.login);
@@ -50,6 +51,7 @@ export function SignupForm({
         }
 
         try {
+            setIsLoading(true);
             const response = await apiFetch('/register', {
                 method: 'POST',
                 body: JSON.stringify({ username: name, email, password }),
@@ -89,6 +91,8 @@ export function SignupForm({
             navigate('/');
         } catch (err: any) {
             setError(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -161,7 +165,9 @@ export function SignupForm({
                                 </FieldDescription>
                             </Field>
                             <Field>
-                                <Button type="submit">Create Account</Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? 'Creating Account...' : 'Create Account'}
+                                </Button>
                             </Field>
                             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                                 Or continue with

@@ -34,6 +34,7 @@ export function LoginForm({
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const navigate = useNavigate();
     const login = useAuthStore((state) => state.login);
@@ -43,6 +44,7 @@ export function LoginForm({
         setError(null);
 
         try {
+            setIsLoading(true);
             const formData = new URLSearchParams();
             formData.append('username', email); // FastAPI expects 'username' for the email field in /token
             formData.append('password', password);
@@ -70,6 +72,8 @@ export function LoginForm({
             navigate('/'); // Redirect to home page on successful login
         } catch (err: any) {
             setError(err.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -132,7 +136,9 @@ export function LoginForm({
                                 />
                             </Field>
                             <Field>
-                                <Button type="submit">Login</Button>
+                                <Button type="submit" disabled={isLoading}>
+                                    {isLoading ? 'Logging in...' : 'Login'}
+                                </Button>
                             </Field>
                             <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                                 Or continue with
